@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Happy Birthday My Love</title>
+    <style>
+        body {
+            background: url('https://images.pexels.com/photos/2072181/pexels-photo-2072181.jpeg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            text-align: center;
+            font-family: 'Comic Sans MS', cursive;
+            padding-top: 100px;
+        }
+        .surprise-box {
+            padding: 20px;
+            border-radius: 15px;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: inline-block;
+            animation: fadeIn 2s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeZoom {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: #ff69b4;
+            color: white;
+            cursor: pointer;
+        }
+        .quote {
+            font-style: italic;
+            margin-top: 30px;
+        }
+        .surprise-message {
+            font-size: 20px;
+            color: #ffe4e1;
+            font-weight: bold;
+            margin-top: 20px;
+            animation: fadeZoom 1s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+<div class="surprise-box">
+    <img src="/harami.jpg" width="200" style="border-radius: 50%; margin-bottom: 15px;" />
+    <h1 th:text="${message}"></h1>
+    <p th:text="${note}"></p>
+    <button onclick="showSurprise()">Click Here for Surprise 🎁</button>
+    
+    <div id="hiddenSurprise" style="display:none; margin-top: 20px;">
+        <img src="https://cdn.pixabay.com/photo/2020/01/26/17/35/cake-4794501_960_720.jpg" width="250"/>
+        <p class="quote" th:text="${quote}"></p>
+
+        <div class="surprise-message">
+            💖 My Sweetest Love 💖<br/><br/>
+            You make my world bloom with happiness every single day.<br/>
+            I hope this birthday brings you all the joy your heart can hold.<br/>
+            You are my today, my tomorrow, and my forever. ❤️<br/><br/>
+            🎂 Happy Birthday, My King! 🎉
+        </div>
+    </div>
+</div>
+
+<audio autoplay loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    function showSurprise() {
+        const hidden = document.getElementById('hiddenSurprise');
+        hidden.style.display = 'block';
+        hidden.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
