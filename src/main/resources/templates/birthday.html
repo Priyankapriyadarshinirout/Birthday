@@ -2,6 +2,10 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Happy Birthday My Love</title>
+
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
     <style>
         body {
             background: url('https://images.pexels.com/photos/2072181/pexels-photo-2072181.jpeg') no-repeat center center fixed;
@@ -10,28 +14,29 @@
             text-align: center;
             font-family: 'Comic Sans MS', cursive;
             padding-top: 100px;
+            overflow: hidden;
         }
+
         .surprise-box {
             padding: 20px;
             border-radius: 15px;
             background-color: rgba(0, 0, 0, 0.6);
             display: inline-block;
             animation: fadeIn 2s ease-in;
+            z-index: 2;
+            position: relative;
         }
+
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
+
         @keyframes fadeZoom {
-            from {
-                opacity: 0;
-                transform: scale(0.8);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
+
         button {
             padding: 10px 20px;
             font-size: 18px;
@@ -42,10 +47,12 @@
             color: white;
             cursor: pointer;
         }
+
         .quote {
             font-style: italic;
             margin-top: 30px;
         }
+
         .surprise-message {
             font-size: 20px;
             color: #ffe4e1;
@@ -53,18 +60,61 @@
             margin-top: 20px;
             animation: fadeZoom 1s ease-in-out;
         }
+
+        /* Floating hearts */
+        .hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .hearts span {
+            position: absolute;
+            animation: floatHearts 8s linear infinite;
+            font-size: 30px;
+            color: #ffb6c1;
+        }
+
+        @keyframes floatHearts {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+
+        /* Slideshow fade */
+        #slideImage {
+            transition: opacity 0.5s ease-in-out;
+        }
     </style>
 </head>
 <body>
+
+<!-- Floating Hearts -->
+<div class="hearts">
+    <span style="left: 10%;">❤️</span>
+    <span style="left: 25%;">💖</span>
+    <span style="left: 40%;">💘</span>
+    <span style="left: 55%;">💕</span>
+    <span style="left: 70%;">💞</span>
+    <span style="left: 85%;">❤️</span>
+</div>
 
 <div class="surprise-box">
     <img src="/harami.jpg" width="200" style="border-radius: 50%; margin-bottom: 15px;" />
     <h1 th:text="${message}"></h1>
     <p th:text="${note}"></p>
-    <button onclick="showSurprise()">Click Here for Surprise 🎁</button>
-    
-    <div id="hiddenSurprise" style="display:none; margin-top: 20px;">
-        <img src="https://cdn.pixabay.com/photo/2020/01/26/17/35/cake-4794501_960_720.jpg" width="250"/>
+
+    <button onclick="showSurprise()">Click Here for Surprise Harami 🎁</button>
+
+    <div id="hiddenSurprise" style="display: none; margin-top: 20px;">
+        <!-- Slideshow -->
+        <div id="slideshow" style="margin-bottom: 20px;">
+            <img id="slideImage" src="https://cdn.pixabay.com/photo/2020/01/26/17/35/cake-4794501_960_720.jpg" width="250" />
+        </div>
+
         <p class="quote" th:text="${quote}"></p>
 
         <div class="surprise-message">
@@ -74,11 +124,18 @@
             You are my today, my tomorrow, and my forever. ❤️<br/><br/>
             🎂 Happy Birthday, My King! 🎉
         </div>
+        <a href="https://wa.me/?text=🌸%20Surprise%20Birthday%20Gift!%20Open%20this:%20https://your-domain.com"
+   target="_blank"
+   style="display:inline-block; margin-top:20px; background-color:#25D366; color:white; padding:10px 15px; border-radius:8px; text-decoration:none;">
+   📤 Share on WhatsApp
+</a>
     </div>
 </div>
 
-<audio autoplay loop>
-    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+<!-- Background Music -->
+<audio id="bgAudio" autoplay loop>
+    <source src="https://cdn.pixabay.com/download/audio/2023/08/23/audio_29b37c1355.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
 </audio>
 
 <script>
@@ -86,8 +143,59 @@
         const hidden = document.getElementById('hiddenSurprise');
         hidden.style.display = 'block';
         hidden.scrollIntoView({ behavior: 'smooth' });
+
+        // Confetti effect
+        confetti({
+            particleCount: 150,
+            spread: 90,
+            origin: { y: 0.6 }
+        });
+
+        // Start background audio
+        const audio = document.getElementById("bgAudio");
+        audio.muted = false;
+        audio.play().catch(() => {
+            document.addEventListener('click', () => {
+                audio.muted = false;
+                audio.play();
+            }, { once: true });
+        });
+
+        // Slideshow logic
+        const images = [
+            "https://cdn.pixabay.com/photo/2020/01/26/17/35/cake-4794501_960_720.jpg",
+            "https://cdn.pixabay.com/photo/2017/08/30/07/52/birthday-2696137_960_720.jpg",
+            "https://cdn.pixabay.com/photo/2016/12/27/15/08/love-1934200_960_720.jpg"
+        ];
+        let index = 0;
+        const slideImage = document.getElementById("slideImage");
+        setInterval(() => {
+            slideImage.style.opacity = 0;
+            setTimeout(() => {
+                index = (index + 1) % images.length;
+                slideImage.src = images[index];
+                slideImage.style.opacity = 1;
+            }, 500);
+        }, 3000);
     }
 </script>
+<!-- Modal Button -->
+<button onclick="document.getElementById('loveModal').style.display='block'" style="margin-top:15px;">💌 Open Love Letter</button>
+
+<!-- Modal Content -->
+<div id="loveModal" style="display:none; position:fixed; z-index:99; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6);">
+  <div style="background:#fff; color:#333; margin:10% auto; padding:20px; border-radius:12px; width:80%; max-width:500px; font-family:Georgia; text-align:left;">
+    <h2 style="color:#ff69b4;">💖 My Love Note 💖</h2>
+    <p>Dear Harami,<br><br>
+    I just want you to know how deeply loved you are, today and always. You light up my life with your smile, kindness, and presence. I feel lucky to call you mine. <br><br>
+    Happy Birthday once again! 🎉<br>
+    Yours forever,<br>
+    ❤️ RUPA ❤️
+    </p>
+    <button onclick="document.getElementById('loveModal').style.display='none'" style="margin-top:15px;">Close</button>
+  </div>
+</div>
+
 
 </body>
 </html>
